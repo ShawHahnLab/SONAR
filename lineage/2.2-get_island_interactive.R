@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 
-"Usage: 2.2-get_island_interactive.R <idDivFile> [ --plot <ids.list> ] [ --mab <abID>... ] [ --outdir <output/tables> --output <islandSeqs.txt> --reference <idDivFile> ]
+"Usage: 2.2-get_island_interactive.R <idDivFile> [ --plot <ids.list> ] [ --mab <abID>... ] [ --outdir <output/tables> --output <islandSeqs.txt> --reference <idDivFile> --plotmethod <plotmethod>]
 
 Options:
   -h --help  	             Show this documentation.
