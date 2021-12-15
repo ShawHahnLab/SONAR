@@ -18,6 +18,7 @@ Options:
 				 [default: islandSeqs]
   --reference <idDivFile>    Other data points to display on plots, eg other members of
                                  the antibody lineage of interest.
+  --plotmethod <plotmethod>  Plotting method to use. [default: original]
 
 
 Created by Chaim A Schramm 2016-08-30.
@@ -200,7 +201,11 @@ getIsland <- function (dataFile, subsetFile, natAbList, outDir, outFile, refPoin
     
       #generate initial plot; supress color bar and increase size of plot title from default
       #   keep title separate, because we'll want to use different titles at different stages
-      pp <- plot_all(smalldata, mab.R, mab, "germline V") + guides(fill=F) + theme( plot.title=element_text(size = 18) )
+      if (opts$plotmethod == "original") {
+        pp <- plot_all(smalldata, mab.R, mab, "germline V") + guides(fill=F) + theme( plot.title=element_text(size = 18) )
+      } else if (opts$plotmethod == "binned") {
+        pp <- plot_all_binned(smalldata, mab.R, mab, "germline V") + guides(fill=F) + theme( plot.title=element_text(size = 18) )
+      }
 
       #want referents to look different on interactive and final figure (mostly about size)
       #   so save this first, then add

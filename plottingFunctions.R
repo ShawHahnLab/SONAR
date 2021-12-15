@@ -52,6 +52,54 @@ plot_all <- function (data, native, pretty, heavy, plot_title=NULL, color=TRUE, 
 	p
 }
 
+plot_all_binned <- function (data, native, pretty, heavy, plot_title=NULL, color=TRUE, guide=TRUE, xlabel=TRUE, ylabel=TRUE, contour=TRUE, conCol = 'black') {
+
+	my_x<-paste("% divergence from", heavy)
+	my_y<-paste("% ID to", pretty)
+
+	if (color) {
+	   my_colors=rev(rainbow(15,end=4/6))
+	} else {
+	   my_colors=rev(gray.colors(5))
+	}
+
+  xbreaks <- seq(0, 60, length.out = 100)
+  ybreaks <- seq(40, 100, length.out = 100)
+  densf <- as.data.frame(table(
+    cut(data$germ_div, breaks = xbreaks, include.lowest = TRUE),
+    cut(data[[native]], breaks = ybreaks, include.lowest = TRUE)))
+  densf$x <- xbreaks[densf$Var1]
+  densf$y <- ybreaks[densf$Var2]
+  densf$z <- densf$Freq
+
+  b <- 1
+  t <- b * 10^4
+  if ( max(densf$z) > t ) {
+	       t <- b * 10^ceiling( log10( max(densf$z) ) )
+	}
+	r     <- 10^seq(log10(b), log10(t), 1)
+
+	p<-ggplot(densf,aes(x,y,z=z)) +
+	 		geom_tile(aes(fill = z)) +
+	  scale_fill_gradientn(colours=rev(rainbow(15,end=4/6)), trans="log10", limits=c(b,t),
+	                       na.value="white", breaks=r, labels=signif(r/b,1),
+	                       guide = guide_colorbar( title="number of\nsequences", title.theme=element_text(size=4,angle=0),
+	                                               barheight = unit(.5,"in"), barwidth = unit(.1,"in"), label.theme=element_text(size=3,angle=0,) ) )+
+			theme_bw() + scale_x_continuous(expand=c(0,0),limits=c(-1, 50)) +
+			scale_y_continuous(expand=c(0,1),limits=c(50,101)) +
+	     		theme(plot.background = element_blank(),panel.grid.major = element_blank(),
+				axis.ticks.length = unit(.02,"in"), axis.ticks = element_line(size = .5),
+		          	panel.grid.minor = element_blank(), axis.text = element_text(size = 6),
+				axis.title = element_text(size = 8), plot.margin = unit(c(.1,.1,.1,.1),"in"),
+				plot.title = element_text(size = 8) )
+
+	if ( contour ) 		     { p <- p + stat_contour(colour=conCol, size=.25, breaks=10*r) }
+	if ( ! is.null(plot_title) ) { p <- p + labs( title=plot_title ) }
+	if ( xlabel ) 		     { p <- p + labs( x=my_x ) } else { p <- p + labs( x="" ) }
+	if ( ylabel ) 		     { p <- p + labs( y=my_y ) } else { p <- p + labs( y="" ) }
+
+	p
+}
 
 
 ####################################
