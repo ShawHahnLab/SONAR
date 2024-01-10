@@ -13,7 +13,11 @@ import sys, os, csv, shutil, re, glob, string, time, random
 try:
 	from SONAR.paths import *
 except ImportError:
-	sys.exit("Can't find paths.py. Have you run setup yet?")
+	try:
+		sys.path.append(os.getenv("SONAR_INSTALL", "/SONAR"))
+		from paths import *
+	except ImportError:
+		sys.exit("Can't find paths.py. Have you run setup yet?")
 from Bio.Data import CodonTable
 
 sep = "\t"
