@@ -28,6 +28,11 @@ RUN apt-get install -y \
   python3 \
   python3-pip
 
+# Otherwise when it gets to "pip3 install python-Levenshtein" below it runs
+# into "ModuleNotFoundError: No module named 'skbuild'" and upgrading pip first
+# fixes it even though I don't know why
+RUN pip3 install --upgrade pip
+
 #get biopython
 RUN pip3 install "biopython==1.73"
 
@@ -124,7 +129,7 @@ RUN ln -s /sratoolkit.2.9.6-1-ubuntu64/bin/fastq-dump /usr/bin/fastq-dump
 
 #pull latest SONAR source code and set it up
 RUN apt-get install -y git libidn11
-RUN git clone https://github.com/ressy/SONAR.git
+RUN git clone -b docker https://github.com/ressy/SONAR.git
 WORKDIR SONAR
 RUN echo | ./setup.py
 RUN cp sonar /usr/bin
