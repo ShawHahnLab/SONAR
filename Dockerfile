@@ -127,8 +127,14 @@ RUN curl -O https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.9.6-1/sratoolkit.2.9.6-
 RUN tar -xzf sratoolkit.2.9.6-1-ubuntu64.tar.gz
 RUN ln -s /sratoolkit.2.9.6-1-ubuntu64/bin/fastq-dump /usr/bin/fastq-dump
 
-#pull latest SONAR source code and set it up
 RUN apt-get install -y git libidn11
+
+# Use latest commit info to trigger Docker cache invalidation from here on for
+# any code changes
+ADD "https://api.github.com/repos/shawhahnlab/SONAR/commits?per_page=1&sha=docker" latest_commit.json
+RUN chmod 644 latest_commit.json
+
+#pull latest SONAR source code and set it up
 RUN git clone -b docker https://github.com/ressy/SONAR.git
 WORKDIR SONAR
 RUN echo | ./setup.py
