@@ -117,7 +117,8 @@ require Exporter;
 
 
 sub ppath{
-    return '%s/third-party/';
+    my $sonar_home = exists($Env{SONAR_HOME}) ? $Env{SONAR_HOME} : '%s';
+    return $sonar_home.'/third-party/';
 }
 
 1;
@@ -142,14 +143,16 @@ if sys.platform.startswith("darwin"):
 ##################################################################
 with open("%s/paths.py"%SONAR_HOME, "w") as paths:
     paths.write("""
-SCRIPT_FOLDER  = '%s'
-blast_cmd = '%s/third-party/%s'
-clustalo  = '%s/third-party/%s'
-clustalw  = '%s/third-party/%s'
-muscle    = '%s/third-party/%s'
-vsearch   = '%s/third-party/%s'
+import os
+SONAR_HOME = os.getenv("SONAR_HOME", "%s")
+SCRIPT_FOLDER = SONAR_HOME
+blast_cmd = f'{SONAR_HOME}/third-party/%s'
+clustalo  = f'{SONAR_HOME}/third-party/%s'
+clustalw  = f'{SONAR_HOME}/third-party/%s'
+muscle    = f'{SONAR_HOME}/third-party/%s'
+vsearch   = f'{SONAR_HOME}/third-party/%s'
 %s
-""" % (SONAR_HOME, SONAR_HOME, blast, SONAR_HOME, clustalo, SONAR_HOME, clustalw, SONAR_HOME, muscle, SONAR_HOME, vsearch, print_cluster))
+""" % (SONAR_HOME, blast, clustalo, clustalw, muscle, vsearch, print_cluster))
 ##################################################################
 with open("%s/sonar"%SONAR_HOME, "w") as sonar:
     sonar.write("""#!/usr/bin/env python3
@@ -180,8 +183,10 @@ from docopt import docopt
 import glob, os, subprocess, sys
 from fuzzywuzzy import fuzz,process
 
+SONAR_HOME=os.getenv("SONAR_HOME", "%s")
+
 def main():
-	script_list  = [fn for fn in glob.glob(\"%s/*/*.py\") if not os.path.basename(fn).startswith(\"_\")] + glob.glob(\"%s/*/*.pl\") + glob.glob(\"%s/*/*.R\")
+	script_list  = [fn for fn in glob.glob(f\"{SONAR_HOME}/*/*.py\") if not os.path.basename(fn).startswith(\"_\")] + glob.glob(f\"{SONAR_HOME}/*/*.pl\") + glob.glob(f\"{SONAR_HOME}/*/*.R\")
 
 	match_script = process.extract(arguments['COMMAND'], script_list, limit=5, scorer=fuzz.partial_ratio)
 
@@ -198,6 +203,6 @@ if __name__ == '__main__':
 	arguments = docopt(__doc__, options_first=True, version=\"SONAR v4.1\")
 	main()
 
-""" %(SONAR_HOME, SONAR_HOME, SONAR_HOME) )
+""" %(SONAR_HOME) )
 ##################################################################
 os.chmod("%s/sonar"%SONAR_HOME, 0o755)
