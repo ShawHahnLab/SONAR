@@ -117,7 +117,7 @@ require Exporter;
 
 
 sub ppath{
-    my $sonar_home = exists($Env{SONAR_HOME}) ? $Env{SONAR_HOME} : '%s';
+    my $sonar_home = exists($ENV{SONAR_HOME}) ? $ENV{SONAR_HOME} : '%s';
     return $sonar_home.'/third-party/';
 }
 
